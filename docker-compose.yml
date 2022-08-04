@@ -11,3 +11,32 @@ services:
       - POSTGRES_DB=blog
       - POSTGRES_USER=blog
       - POSTGRES_PASSWORD=blog
+    networks:
+      - blog_main_network
+
+  blog_rabbitmq:
+    container_name: blog_rabbitmq
+    image: rabbitmq:latest
+    restart: always
+    ports:
+      - "5672:5672"
+    networks:
+      - blog_main_network
+    depends_on:
+      - blog_postgres
+
+  blog_memcached:
+    container_name: blog_memcached
+    image: memcached:latest
+    restart: always
+    ports:
+      - "11211:11211"
+    networks:
+      - blog_main_network
+    depends_on:
+      - blog_postgres
+      - blog_rabbitmq
+
+networks:
+  blog_main_network:
+    external: true
