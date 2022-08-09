@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from .forms import UserCreationForm, UserChangeForm
 from django.utils.translation import gettext_lazy as _
-from .models import User
+from .models import User, Follow
 
 
 class UserAdmin(BaseUserAdmin):
@@ -21,7 +21,7 @@ class UserAdmin(BaseUserAdmin):
     )
 
     add_fieldsets = (
-        (None, {"fields": ('username', 'email', 'password1', 'password2')})
+        (None, {"fields": ('username', 'email', 'password1', 'password2')}),
     )
 
     search_fields = ('username', 'email')
@@ -39,3 +39,4 @@ class UserAdmin(BaseUserAdmin):
 
 
 admin.site.register(User, UserAdmin)
+admin.site.register(Follow)

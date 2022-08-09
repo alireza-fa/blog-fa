@@ -1,15 +1,17 @@
+from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
-
 from .serializers import (TokenJWTSerializer, RegistrationSerializer, VerifyAccountSerializer,
                           PasswordChangeSerializer, PasswordForgetSerializer, PasswordForgetConfirmSerializer,
-                          UserSerializer,)
+                          UserSerializer, LogoutSerializer)
+from .models import Follow
+
 from rest_framework.views import APIView
 from rest_framework.generics import RetrieveUpdateDestroyAPIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.viewsets import ModelViewSet
-from permissions import IsNotAuthenticated, IsOwnerOrReadOnly
+from permissions import IsNotAuthenticated, IsOwnerOrReadOnly, IsAuthenticatedAndNotObjectOwner
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 
 
@@ -88,3 +90,28 @@ class UserViewSet(ModelViewSet):
 class UserDetailCreateView(RetrieveUpdateDestroyAPIView):
     queryset = get_user_model().objects.all()
     permission_classes = (IsOwnerOrReadOnly,)
+
+
+class FollowUserView(APIView):
+    permission_classes = (IsAuthenticatedAndNotObjectOwner,)
+
+    def post(self, request, user_id):
+        user = get_object_or_404(get_user_model(), id=user_id)
+        self.check_object_permissions(request, user)
+        follow_check = request.user.following.filter(follow=request.user, user=user)
+        if follow_check.exists():
+            follow_check.delete()
+        else:
+            Follow.objects.create(user=user, follow=request.user)
+        return Response(data={"msg": 'successfully'}, status=status.HTTP_200_OK)
+
+
+class UserLogoutView(APIView):
+    serializer_class = LogoutSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)

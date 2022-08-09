@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.utils.translation import gettext_lazy as _
@@ -32,3 +33,17 @@ class User(AbstractBaseUser, PermissionsMixin):
     @property
     def is_staff(self):
         return self.is_admin
+
+
+class Follow(models.Model):
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='followers')
+    follow = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='following')
+    created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ('-created',)
+        verbose_name = _('Follow')
+        verbose_name_plural = _('Follows')
+
+    def __str__(self):
+        return f'{self.user} --> {self.follow}'

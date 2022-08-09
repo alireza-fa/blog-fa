@@ -16,7 +16,7 @@ class UserCreationForm(forms.ModelForm):
         cd = self.cleaned_data
         if cd['password1'] and cd['password2'] and cd['password1'] != cd['password2']:
             raise forms.ValidationError('Passwords don\'t match')
-        return cd['password']
+        return cd['password1']
 
     def save(self, commit=True):
         user = super().save(commit=False)

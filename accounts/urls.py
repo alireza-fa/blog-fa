@@ -20,4 +20,6 @@ urlpatterns = [
     path('password/change/', views.PasswordChangeView.as_view(), name='password_reset'),
     path('password/forget/', views.PasswordForgetView.as_view(), name='password_forget'),
     path('password/forget/verify/', views.PasswordForgetConfirmView.as_view(), name='verify_forget'),
+    path('follow/<int:user_id>/', views.FollowUserView.as_view(), name='follow_user'),
+    path('logout/', views.UserLogoutView.as_view(), name='logout'),
 ]
